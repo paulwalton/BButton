@@ -64,6 +64,7 @@
     self.titleLabel.font = [UIFont boldSystemFontOfSize:17.0f];
     self.shouldShowDisabled = NO;
     [self setType:BButtonTypeDefault];
+    
 }
 
 - (id)initWithFrame:(CGRect)frame type:(BButtonType)type
@@ -85,6 +86,7 @@
     if(self) {
         self.color = aColor;
     }
+    
     return self;
 }
 
@@ -96,6 +98,7 @@
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
         [self setTitle:[NSString stringFromAwesomeIcon:icon] forState:UIControlStateNormal];
     }
+    
     return self;
 }
 
@@ -105,6 +108,7 @@
     if(self) {
         [self setup];
     }
+    
     return self;
 }
 
@@ -114,6 +118,7 @@
     if(self) {
         [self setup];
     }
+    
     return self;
 }
 
@@ -123,6 +128,7 @@
     if(self) {
         [self setup];
     }
+    
     return self;
 }
 
@@ -225,6 +231,8 @@
     }
     
     [self setTitle:title forState:UIControlStateNormal];
+    
+    
 }
 
 + (UIColor *)colorForButtonType:(BButtonType)type
@@ -275,6 +283,20 @@
 - (void)drawRect:(CGRect)rect
 {
     [super drawRect:rect];
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    UIColor *topColor = [self.color lightenColorWithValue:0.12f];
+    
+    NSArray *newGradientColors = [NSArray arrayWithObjects:(id)topColor.CGColor, (id)self.color.CGColor, nil];
+    
+    
+    
+    
+    CGFloat newGradientLocations[] = {0.0f, 1.0f};
+    
+    gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)newGradientColors, newGradientLocations);
+    CGColorSpaceRelease(colorSpace);
+    
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     UIColor *border = [self.color darkenColorWithValue:0.06f];
@@ -298,6 +320,8 @@
                                 CGPointMake(0.0f, self.highlighted ? 0.5f : rect.size.height - 0.5f), 0.0f);
     
     CGContextRestoreGState(context);
+    
+    
     
     if(!self.highlighted) {
         // Rounded Rectangle Inner Shadow
@@ -327,9 +351,17 @@
         CGContextRestoreGState(context);
     }
     
+    
+    
+    
+    
     [border setStroke];
     roundedRectanglePath.lineWidth = 1.0f;
     [roundedRectanglePath stroke];
+    
+    CGGradientRelease(gradient);
+    
+    
 }
 
 - (void)setGradientEnabled:(BOOL)enabled
@@ -341,7 +373,10 @@
     CGFloat newGradientLocations[] = {0.0f, 1.0f};
     
     gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)newGradientColors, newGradientLocations);
+    
     CGColorSpaceRelease(colorSpace);
+    CFBridgingRelease(gradient);
 }
+
 
 @end
